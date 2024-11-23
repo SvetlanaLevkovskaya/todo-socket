@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from 'react'
 
-import { io } from 'socket.io-client'
-
 import { FilterSection } from '@/app/_ui/FilterSection/FilterSection'
 import { Canvas } from '@/app/_ui/Todo/Canvas'
 import { TaskEditor } from '@/app/_ui/Todo/TaskEditor'
 import { TaskList } from '@/app/_ui/Todo/TaskList'
+import { getSocket } from '@/socket'
 import { Task } from '@/types'
 
 export const Todo = () => {
@@ -15,13 +14,13 @@ export const Todo = () => {
   const [editingTask, setEditingTask] = useState<Task | null>(null)
 
   useEffect(() => {
-    if (tasks.length === 0) {
-      fetch('/api/tasks')
-        .then((res) => res.json())
-        .then((data) => setTasks(data))
-    }
+    fetch('/api/tasks')
+      .then((res) => res.json())
+      .then((data) => setTasks(data))
+      .catch((error) => console.error('Failed to fetch tasks:', error))
 
-    const socket = io('http://localhost:3003')
+    const socket = getSocket()
+
     socket.on('connect', () => {
       console.log('Socket.IO connected')
     })
@@ -32,6 +31,8 @@ export const Todo = () => {
         setTasks((prev) => [...prev, change.task])
       } else if (change.action === 'deleted') {
         setTasks((prev) => prev.filter((task) => task.id !== change.taskId))
+      } else if (change.action === 'edited') {
+        setTasks((prev) => prev.map((task) => (task.id === change.task.id ? change.task : task)))
       }
     })
 
@@ -40,9 +41,9 @@ export const Todo = () => {
     })
 
     return () => {
-      socket.disconnect()
+      socket.off('change')
     }
-  }, [tasks.length])
+  }, [])
 
   const addTask = (task: Omit<Task, 'id'>) => {
     fetch('/api/tasks', {
@@ -52,23 +53,38 @@ export const Todo = () => {
     })
       .then((res) => res.json())
       .then((newTask: Task) => {
-        const socket = io('http://localhost:3003')
+        const socket = getSocket()
         socket.emit('addTask', newTask)
       })
   }
 
   const deleteTask = (id: string) => {
     fetch(`/api/tasks/${id}`, { method: 'DELETE' }).then(() => {
-      const socket = io('http://localhost:3003')
+      const socket = getSocket()
       socket.emit('deleteTask', id)
     })
+  }
+
+  const editTask = (updatedTask: Task) => {
+    fetch(`/api/tasks/${updatedTask.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedTask),
+    })
+      .then((res) => res.json())
+      .then((newTask) => {
+        const socket = getSocket()
+        socket.emit('editTask', newTask)
+        setEditingTask(null)
+      })
+      .catch((error) => console.error('Failed to update task:', error))
   }
 
   return (
     <div className="flex justify-center gap-2">
       <FilterSection />
       <div className="max-w-4xl mx-auto p-4">
-        <TaskEditor onSave={addTask} initialTask={editingTask} />
+        <TaskEditor onSave={editingTask ? editTask : addTask} initialTask={editingTask} />
         <TaskList tasks={tasks} onEdit={setEditingTask} onDelete={deleteTask} />
         <Canvas tasks={tasks} />
       </div>

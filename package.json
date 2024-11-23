@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently \"npm run next-dev\" \"npm run json-server\" \"npm run socket-server\"",
+    "next-dev": "next dev",
     "json-server": "json-server --watch db.json --port 3002",
     "socket-server": "node server.js",
     "build": "next build",

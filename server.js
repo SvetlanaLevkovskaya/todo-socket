@@ -44,6 +44,12 @@ io.on('connection', (socket) => {
     console.log('Task deleted:', taskId)
   })
 
+  socket.on('editTask', (updatedTask) => {
+    tasks = tasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
+    io.emit('change', { action: 'edited', task: updatedTask })
+    console.log('Task updated:', updatedTask)
+  })
+
   socket.on('disconnect', () => {
     console.log('Client disconnected')
   })

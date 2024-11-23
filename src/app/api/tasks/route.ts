@@ -2,20 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const JSON_SERVER_URL = 'http://localhost:3002/tasks'
 
-export async function OPTIONS() {
-  return NextResponse.json(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': 'http://localhost:3000',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  })
-}
-
 export async function GET() {
   try {
-    const response = await fetch(JSON_SERVER_URL)
+    const response = await fetch(JSON_SERVER_URL, {
+      next: { revalidate: 60 },
+    })
     if (!response.ok) {
       console.error('Failed to fetch tasks:', response.statusText)
       return NextResponse.json({ error: 'Failed to fetch tasks' }, { status: 500 })
@@ -66,6 +57,36 @@ export async function DELETE(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: 'An error occurred while deleting the task' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const { pathname } = new URL(req.url)
+    const id = pathname.split('/').pop()
+    const body = await req.json()
+
+    if (!id) {
+      return NextResponse.json({ error: 'Task ID is required' }, { status: 400 })
+    }
+
+    const response = await fetch(`${JSON_SERVER_URL}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+
+    if (!response.ok) {
+      return NextResponse.json({ error: 'Failed to update task' }, { status: 500 })
+    }
+
+    const updatedTask = await response.json()
+    return NextResponse.json(updatedTask)
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'An error occurred while updating the task' },
       { status: 500 }
     )
   }

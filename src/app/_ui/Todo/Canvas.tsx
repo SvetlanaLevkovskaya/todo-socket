@@ -14,9 +14,9 @@ export const Canvas = ({ tasks }: any) => {
       const rect = new fabric.Rect({
         left: 50 + index * 100,
         top: 50,
-        fill: 'blue',
-        width: 50,
-        height: 50,
+        fill: 'lightgray',
+        width: 100,
+        height: 100,
       })
 
       const text = new fabric.Textbox(task.name, {
@@ -24,8 +24,8 @@ export const Canvas = ({ tasks }: any) => {
         top: 120,
         fontSize: 14,
         fill: 'black',
-        width: 90, // Ограничение ширины текста
-        textAlign: 'center', // Выравнивание текста
+        width: 90,
+        textAlign: 'center',
       })
 
       canvas.add(rect)
