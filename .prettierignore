@@ -1,0 +1,6 @@
+src/typing/__generated__.ts
+/.next/
+/node_modules/
+/generate_types/
+/.vscode/
+
