@@ -27,7 +27,7 @@ const SearchBarComponent = () => {
     if (pathname !== '/') {
       setQuery('')
     }
-  }, [, pathname])
+  }, [pathname])
 
   const handleChangeQuery = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -41,10 +41,10 @@ const SearchBarComponent = () => {
   }, [query])
 
   return (
-    <div className="relative max-w-[428px]">
+    <div className="relative max-w-[618px]">
       <input
         ref={inputRef}
-        className="w-[300px] sm:w-[428px] border border-slate-200 focus:border-amber-500 transition-all p-4 pl-6 rounded-lg text-sm placeholder-gray-500 outline-none"
+        className="w-[300px] sm:w-[618px] border border-slate-200 focus:border-amber-500 transition-all p-4 pl-6 rounded-lg text-sm placeholder-gray-500 outline-none"
         placeholder="Search"
         onChange={handleChangeQuery}
         value={query}

@@ -7,7 +7,7 @@ const FilterSectionComponent = () => {
     const category = event.target.value
   }
   return (
-    <aside className="w-full md:w-1/4">
+    <aside className="w-full md:w-1/4 px-4">
       <h2 className="text-base font-medium mb-8">Filters</h2>
       {FILTERS &&
         FILTERS.map((category) => (

@@ -1,3 +1,10 @@
 {
-  "tasks": []
+  "tasks": [
+    {
+      "name": "task2",
+      "description": "task2 desc",
+      "deadline": "2024-12-01",
+      "id": 2
+    }
+  ]
 }

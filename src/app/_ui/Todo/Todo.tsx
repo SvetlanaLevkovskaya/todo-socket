@@ -12,6 +12,7 @@ import { Task } from '@/types'
 export const Todo = () => {
   const [tasks, setTasks] = useState<Task[]>([])
   const [editingTask, setEditingTask] = useState<Task | null>(null)
+  const [isTaskEditorVisible, setTaskEditorVisible] = useState(false)
 
   useEffect(() => {
     fetch('/api/tasks')
@@ -55,6 +56,7 @@ export const Todo = () => {
       .then((newTask: Task) => {
         const socket = getSocket()
         socket.emit('addTask', newTask)
+        setTaskEditorVisible(false)
       })
   }
 
@@ -76,16 +78,54 @@ export const Todo = () => {
         const socket = getSocket()
         socket.emit('editTask', newTask)
         setEditingTask(null)
+        setTaskEditorVisible(false)
       })
       .catch((error) => console.error('Failed to update task:', error))
   }
 
+  const handleAddTaskClick = () => {
+    setEditingTask(null)
+    setTaskEditorVisible(true)
+  }
+
+  const handleEditTaskClick = (task: Task) => {
+    setEditingTask(task)
+    setTaskEditorVisible(true)
+  }
+
+  const handleCancelTaskEditor = () => {
+    setEditingTask(null)
+    setTaskEditorVisible(false)
+  }
+
+  const handleSaveTask = (task: Omit<Task, 'id'> | Task) => {
+    if ('id' in task) {
+      editTask(task)
+    } else {
+      addTask(task)
+    }
+  }
+
   return (
-    <div className="flex justify-center gap-2">
+    <div className="flex flex-col md:flex-row justify-center gap-4">
       <FilterSection />
-      <div className="max-w-4xl mx-auto p-4">
-        <TaskEditor onSave={editingTask ? editTask : addTask} initialTask={editingTask} />
-        <TaskList tasks={tasks} onEdit={setEditingTask} onDelete={deleteTask} />
+      <div className="flex-grow px-4 max-w-[650px] w-full">
+        <TaskList
+          tasks={tasks}
+          onEdit={handleEditTaskClick}
+          onDelete={deleteTask}
+          onAddTask={handleAddTaskClick}
+        />
+        {isTaskEditorVisible && (
+          <div key={editingTask?.id || 'new'} className="my-4 pb-6">
+            <TaskEditor
+              onSave={handleSaveTask}
+              initialTask={editingTask ? { ...editingTask } : undefined} // Приведение типа
+              onCancel={handleCancelTaskEditor}
+            />
+          </div>
+        )}
+
         <Canvas tasks={tasks} />
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import { ToastContainer } from 'react-toastify'
 
 import type { Metadata } from 'next'
 import { Manrope } from 'next/font/google'
@@ -28,6 +29,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={manrope.className}>
         <Suspense fallback={<Spinner />}>
+          <ToastContainer limit={1} />
           <MainLayout>{children}</MainLayout>
         </Suspense>
       </body>
