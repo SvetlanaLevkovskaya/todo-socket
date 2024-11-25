@@ -68,10 +68,10 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
           const rect = new fabric.Rect({
             width: taskWidth,
             height: taskHeight,
-            fill: '#f3f4f6',
+            fill: task.completed ? '#ccfbf1' : '#f1f5f9',
             rx: 8,
             ry: 8,
-            stroke: 'rgb(226 232 240)',
+            stroke: '#e2e8f0',
             strokeWidth: 1,
           })
 
@@ -80,7 +80,6 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
             fill: '#1f2937',
             width: taskWidth - padding * 2,
             textAlign: 'center',
-            fontFamily: 'Arial',
             top: padding,
             left: padding,
             splitByGrapheme: true,
@@ -93,7 +92,6 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
             top: taskHeight - padding - 10,
             left: padding,
             textAlign: 'center',
-            fontFamily: 'Arial',
           })
 
           dateText.left = (taskWidth - dateText.width!) / 2

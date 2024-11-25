@@ -8,15 +8,20 @@ export const TaskList = ({
   onEdit,
   onDelete,
   onAddTask,
+  onToggleComplete,
 }: {
   tasks: Task[]
   onEdit: (task: Task) => void
   onDelete: (id: string) => void
   onAddTask: () => void
+  onToggleComplete: (id: string, completed: boolean) => void
 }) => {
   const handleEdit = (task: Task): void => {
-    console.log('task', task)
     onEdit(task)
+  }
+
+  const handleToggleComplete = (id: string, completed: boolean) => {
+    onToggleComplete(id, completed)
   }
 
   return (
@@ -26,8 +31,16 @@ export const TaskList = ({
         {tasks.map((task) => (
           <li
             key={task.id}
-            className="flex justify-between gap-2 items-center p-2 border rounded-lg"
+            className={`flex justify-between gap-2 items-center p-2 border rounded-lg ${
+              task.completed ? 'bg-teal-50' : ''
+            }`}
           >
+            <input
+              type="checkbox"
+              checked={task.completed}
+              onChange={(e) => handleToggleComplete(task.id, e.target.checked)}
+              className="mr-2 h-3 w-3 accent-orange-300 focus:ring-2 focus:ring-offset-2 focus:ring-orange-300 transition-all hover:scale-110"
+            />
             <span className="text-sm break-all">{truncateTitle(task.name, 20)}</span>
             <div className="flex justify-center gap-2 flex-col sm:flex-row">
               <button

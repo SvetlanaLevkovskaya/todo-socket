@@ -16,6 +16,9 @@ export const Todo = () => {
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [isTaskEditorVisible, setTaskEditorVisible] = useState(false)
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([])
+  const [selectedFilters, setSelectedFilters] = useState<string>(
+    typeof window !== 'undefined' ? localStorage.getItem('selectedFilter') || 'all' : 'all'
+  )
 
   useEffect(() => {
     fetch('/api/tasks')
@@ -29,30 +32,57 @@ export const Todo = () => {
       console.log('Socket.IO connected')
     })
 
-    socket.on('change', (change) => {
+    const handleSocketChange = (change: any) => {
       if (change.action === 'added') {
         setTasks((prev) => [...prev, change.task])
       } else if (change.action === 'deleted') {
         setTasks((prev) => prev.filter((task) => task.id !== change.taskId))
       } else if (change.action === 'edited') {
         setTasks((prev) => prev.map((task) => (task.id === change.task.id ? change.task : task)))
+      } else if (change.action === 'completed') {
+        setTasks((prev) =>
+          prev.map((task) =>
+            task.id === change.id ? { ...task, completed: change.completed } : task
+          )
+        )
       }
-    })
+    }
 
-    socket.on('disconnect', () => {
-      console.log('Socket.IO disconnected')
-    })
+    socket.on('change', handleSocketChange)
 
     return () => {
-      socket.off('change')
+      socket.off('connect')
+      socket.off('change', handleSocketChange)
     }
   }, [])
 
   useEffect(() => {
-    setFilteredTasks(
-      tasks.filter((task) => task.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    )
-  }, [searchQuery, tasks])
+    const applyFilters = () => {
+      let filtered = tasks
+
+      filtered = filtered.filter((task) =>
+        task.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+
+      if (selectedFilters === 'done') {
+        filtered = filtered.filter((task) => task.completed)
+      }
+
+      if (selectedFilters === 'in progress') {
+        filtered = filtered.filter((task) => !task.completed)
+      }
+
+      setFilteredTasks(filtered)
+    }
+
+    applyFilters()
+  }, [selectedFilters, tasks, searchQuery])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedFilter', selectedFilters)
+    }
+  }, [selectedFilters])
 
   const addTask = (task: Omit<Task, 'id'>) => {
     fetch('/api/tasks', {
@@ -112,23 +142,51 @@ export const Todo = () => {
     setTaskEditorVisible(false)
   }
 
-  const handleSaveTask = (task: Omit<Task, 'id'> | Task) => {
+  const handleSaveTask = (task: Omit<Task, 'id' | 'completed'> | Task) => {
     if ('id' in task) {
-      editTask(task)
+      editTask(task as Task)
     } else {
-      addTask(task)
+      const newTask = { ...task, completed: false }
+      addTask(newTask as Omit<Task, 'id'>)
     }
+  }
+
+  const handleToggleComplete = (id: string, completed: boolean) => {
+    fetch(`/api/tasks/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ completed }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to toggle task completion')
+        return res.json()
+      })
+      .then((updatedTask: Task) => {
+        const socket = getSocket()
+        socket.emit('toggleComplete', { id, completed })
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task.id === updatedTask.id ? { ...task, completed: updatedTask.completed } : task
+          )
+        )
+      })
+      .catch((error) => console.error('Error toggling task completion:', error))
+  }
+
+  const handleFilterChange = (filter: string) => {
+    setSelectedFilters(filter)
   }
 
   return (
     <div className="flex flex-col md:flex-row justify-center gap-4">
-      <FilterSection />
+      <FilterSection selectedFilters={selectedFilters} onFilterChange={handleFilterChange} />
       <div className="flex-grow px-4 max-w-[650px] min-w-[330px] w-full">
         <TaskList
           tasks={filteredTasks}
           onEdit={handleEditTaskClick}
           onDelete={deleteTask}
           onAddTask={handleAddTaskClick}
+          onToggleComplete={handleToggleComplete}
         />
         {isTaskEditorVisible && (
           <div key={editingTask?.id || 'new'} className="my-4 pb-6">

@@ -62,7 +62,7 @@ export async function DELETE(req: NextRequest) {
   }
 }
 
-export async function PUT(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   try {
     const { pathname } = new URL(req.url)
     const id = pathname.split('/').pop()
@@ -73,7 +73,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const response = await fetch(`${JSON_SERVER_URL}/${id}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })

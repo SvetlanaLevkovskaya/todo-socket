@@ -8,7 +8,7 @@ export const TaskEditor = ({
   initialTask,
   onCancel,
 }: {
-  onSave: (updatedTask: Task | Omit<Task, 'id'>) => void
+  onSave: (updatedTask: { name: string; description: string; deadline: string }) => void
   initialTask?: Task | Omit<Task, 'id'>
   onCancel: () => void
 }) => {
