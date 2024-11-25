@@ -1,226 +1,191 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { FilterSection } from '@/app/_ui/FilterSection/FilterSection'
 import { SortSelect } from '@/app/_ui/SortSelect/SortSelect'
 import { Canvas } from '@/app/_ui/Todo/Canvas'
 import { TaskEditor } from '@/app/_ui/Todo/TaskEditor'
 import { TaskList } from '@/app/_ui/Todo/TaskList'
+import {
+  createTask,
+  deleteTask,
+  fetchTasks,
+  toggleTaskCompletion,
+  updateTask,
+} from '@/app/api/apiService'
 import { useSearch } from '@/providers/searchProvider'
 import { getSocket } from '@/socket'
 import { Task } from '@/types'
+
+const saveToLocalStorage = (key: string, value: string) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(key, value)
+  }
+}
+
+const readFromLocalStorage = (key: string, fallback: string) => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem(key) || fallback
+  }
+  return fallback
+}
 
 export const Todo = () => {
   const { searchQuery } = useSearch()
   const [tasks, setTasks] = useState<Task[]>([])
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [isTaskEditorVisible, setTaskEditorVisible] = useState(false)
-  const [filteredTasks, setFilteredTasks] = useState<Task[]>([])
   const [selectedFilters, setSelectedFilters] = useState<string>(
-    typeof window !== 'undefined' ? localStorage.getItem('selectedFilter') || 'all' : 'all'
+    readFromLocalStorage('selectedFilter', 'all')
   )
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(
-    typeof window !== 'undefined'
-      ? (localStorage.getItem('sortOrder') as 'asc' | 'desc') || 'asc'
-      : 'asc'
+    readFromLocalStorage('sortOrder', 'asc') as 'asc' | 'desc'
   )
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>([])
 
   useEffect(() => {
-    fetch('/api/tasks')
-      .then((res) => res.json())
-      .then((data) => setTasks(data))
-      .catch((error) => console.error('Failed to fetch tasks:', error))
+    fetchTasks()
+      .then(setTasks)
+      .catch((error) => console.error('Error fetching tasks:', error))
+  }, [])
 
+  useEffect(() => {
     const socket = getSocket()
 
-    socket.on('connect', () => {
-      console.log('Socket.IO connected')
-    })
-
-    const handleSocketChange = (change: any) => {
-      if (change.action === 'added') {
-        setTasks((prev) => [...prev, change.task])
-      } else if (change.action === 'deleted') {
-        setTasks((prev) => prev.filter((task) => task.id !== change.taskId))
-      } else if (change.action === 'edited') {
-        setTasks((prev) => prev.map((task) => (task.id === change.task.id ? change.task : task)))
-      } else if (change.action === 'completed') {
-        setTasks((prev) =>
-          prev.map((task) =>
-            task.id === change.id ? { ...task, completed: change.completed } : task
-          )
-        )
-      }
+    const handleSocketChange = (change: {
+      action: string
+      task?: Task
+      taskId?: string
+      id?: string
+      completed?: boolean
+    }) => {
+      setTasks((prev) => {
+        switch (change.action) {
+          case 'added':
+            return [...prev, change.task!]
+          case 'deleted':
+            return prev.filter((task) => task.id !== change.taskId)
+          case 'edited':
+            return prev.map((task) => (task.id === change.task!.id ? change.task! : task))
+          case 'toggledComplete':
+            return prev.map((task) =>
+              task.id === change.id ? { ...task, completed: change.completed! } : task
+            )
+          default:
+            return prev
+        }
+      })
     }
 
     socket.on('change', handleSocketChange)
 
     return () => {
-      socket.off('connect')
       socket.off('change', handleSocketChange)
     }
   }, [])
 
   useEffect(() => {
     const applyFilters = () => {
-      let filtered = tasks
-
-      filtered = filtered.filter((task) =>
+      let result = tasks.filter((task) =>
         task.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
 
       if (selectedFilters === 'done') {
-        filtered = filtered.filter((task) => task.completed)
+        result = result.filter((task) => task.completed)
+      } else if (selectedFilters === 'in progress') {
+        result = result.filter((task) => !task.completed)
       }
 
-      if (selectedFilters === 'in progress') {
-        filtered = filtered.filter((task) => !task.completed)
-      }
-
-      filtered = filtered.sort((a, b) => {
-        const dateA = new Date(a.deadline)
-        const dateB = new Date(b.deadline)
-        return sortOrder === 'asc'
-          ? dateA.getTime() - dateB.getTime()
-          : dateB.getTime() - dateA.getTime()
+      result = result.sort((a, b) => {
+        const dateA = new Date(a.deadline).getTime()
+        const dateB = new Date(b.deadline).getTime()
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA
       })
 
-      setFilteredTasks(filtered)
+      setFilteredTasks(result)
     }
 
     applyFilters()
-  }, [selectedFilters, tasks, searchQuery, sortOrder])
+  }, [tasks, selectedFilters, searchQuery, sortOrder])
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('selectedFilter', selectedFilters)
-      localStorage.setItem('sortOrder', sortOrder)
-    }
+    saveToLocalStorage('selectedFilter', selectedFilters)
+    saveToLocalStorage('sortOrder', sortOrder)
   }, [selectedFilters, sortOrder])
 
-  const addTask = (task: Omit<Task, 'id'>) => {
-    fetch('/api/tasks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(task),
-    })
-      .then((res) => res.json())
-      .then((newTask: Task) => {
+  const handleSaveTask = useCallback(async (task: Task | Omit<Task, 'id'>) => {
+    try {
+      if ('id' in task) {
+        const updatedTask = await updateTask(task)
+        const socket = getSocket()
+        socket.emit('editTask', updatedTask)
+      } else {
+        const newTask = await createTask(task)
         const socket = getSocket()
         socket.emit('addTask', newTask)
-        setTaskEditorVisible(false)
-      })
-  }
+      }
+      setTaskEditorVisible(false)
+    } catch (error) {
+      console.error('Error saving task:', error)
+    }
+  }, [])
 
-  const deleteTask = (id: string) => {
-    fetch(`/api/tasks/${id}`, { method: 'DELETE' }).then(() => {
+  const handleDeleteTask = async (id: string) => {
+    try {
+      await deleteTask(id)
       const socket = getSocket()
       socket.emit('deleteTask', id)
-
-      const savedOrder: string[] = JSON.parse(localStorage.getItem('taskOrder') || '[]')
-
-      const updatedOrder = savedOrder.filter((taskId) => taskId !== id)
-
-      localStorage.setItem('taskOrder', JSON.stringify(updatedOrder))
-    })
-  }
-
-  const editTask = (updatedTask: Task) => {
-    fetch(`/api/tasks/${updatedTask.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedTask),
-    })
-      .then((res) => res.json())
-      .then((newTask) => {
-        const socket = getSocket()
-        socket.emit('editTask', newTask)
-        setEditingTask(null)
-        setTaskEditorVisible(false)
-      })
-      .catch((error) => console.error('Failed to update task:', error))
-  }
-
-  const handleAddTaskClick = () => {
-    setEditingTask(null)
-    setTaskEditorVisible(true)
-  }
-
-  const handleEditTaskClick = (task: Task) => {
-    setEditingTask(task)
-    setTaskEditorVisible(true)
-  }
-
-  const handleCancelTaskEditor = () => {
-    setEditingTask(null)
-    setTaskEditorVisible(false)
-  }
-
-  const handleSaveTask = (task: Omit<Task, 'id' | 'completed'> | Task) => {
-    if ('id' in task) {
-      editTask(task as Task)
-    } else {
-      const newTask = { ...task, completed: false }
-      addTask(newTask as Omit<Task, 'id'>)
+    } catch (error) {
+      console.error('Error deleting task:', error)
     }
   }
 
-  const handleToggleComplete = (id: string, completed: boolean) => {
-    fetch(`/api/tasks/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ completed }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to toggle task completion')
-        return res.json()
-      })
-      .then((updatedTask: Task) => {
-        const socket = getSocket()
-        socket.emit('toggleComplete', { id, completed })
-        setTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task.id === updatedTask.id ? { ...task, completed: updatedTask.completed } : task
-          )
+  const handleToggleComplete = async (id: string, completed: boolean) => {
+    try {
+      const updatedTask = await toggleTaskCompletion(id, completed)
+      const socket = getSocket()
+      socket.emit('toggleComplete', { id, completed })
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === updatedTask.id ? { ...task, completed: updatedTask.completed } : task
         )
-      })
-      .catch((error) => console.error('Error toggling task completion:', error))
-  }
-
-  const handleFilterChange = (filter: string) => {
-    setSelectedFilters(filter)
-  }
-
-  const handleSortChange = (order: 'asc' | 'desc') => {
-    setSortOrder(order)
+      )
+    } catch (error) {
+      console.error('Error toggling task completion:', error)
+    }
   }
 
   return (
     <div className="flex flex-col md:flex-row justify-center gap-6 sm:gap-24">
       <div className="flex flex-col gap-4">
-        <FilterSection selectedFilters={selectedFilters} onFilterChange={handleFilterChange} />
-        <SortSelect sortOrder={sortOrder} onSortChange={handleSortChange} />
+        <FilterSection selectedFilters={selectedFilters} onFilterChange={setSelectedFilters} />
+        <SortSelect sortOrder={sortOrder} onSortChange={setSortOrder} />
       </div>
 
       <div className="flex-grow px-4 max-w-[650px] min-w-[330px] w-full">
         <TaskList
           tasks={filteredTasks}
-          onEdit={handleEditTaskClick}
-          onDelete={deleteTask}
-          onAddTask={handleAddTaskClick}
+          onEdit={(task) => {
+            setEditingTask(task)
+            setTaskEditorVisible(true)
+          }}
+          onDelete={handleDeleteTask}
+          onAddTask={() => {
+            setEditingTask(null)
+            setTaskEditorVisible(true)
+          }}
           onToggleComplete={handleToggleComplete}
         />
         {isTaskEditorVisible && (
-          <div key={editingTask?.id || 'new'} className="my-4 pb-6">
+          <div className="my-4 pb-6">
             <TaskEditor
+              initialTask={editingTask}
               onSave={handleSaveTask}
-              initialTask={editingTask ? { ...editingTask } : undefined}
-              onCancel={handleCancelTaskEditor}
+              onCancel={() => setTaskEditorVisible(false)}
             />
           </div>
         )}
-
         <Canvas tasks={filteredTasks} />
       </div>
     </div>

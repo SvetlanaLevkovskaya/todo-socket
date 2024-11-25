@@ -28,21 +28,25 @@ export const TaskList = ({
     <div className="pb-4">
       <h2 className="text-base font-medium mb-8">Tasks</h2>
       <ul className="space-y-2">
-        {tasks.map((task) => (
+        {tasks.map((task, index) => (
           <li
-            key={task.id}
+            key={`${index}-${task.id}`}
             className={`flex justify-between gap-2 items-center p-2 border rounded-lg ${
               task.completed ? 'bg-teal-50' : ''
             }`}
           >
-            <input
-              type="checkbox"
-              checked={task.completed}
-              onChange={(e) => handleToggleComplete(task.id, e.target.checked)}
-              className="mr-2 h-3 w-3 accent-orange-300 focus:ring-2 focus:ring-offset-2 focus:ring-orange-300 transition-all hover:scale-110"
-            />
-            <span className="text-sm break-all">{truncateTitle(task.name, 20)}</span>
-            <span className="text-sm break-all">{task.deadline}</span>
+            <div className="flex justify-center items-center gap-2">
+              <input
+                type="checkbox"
+                checked={task.completed}
+                onChange={(e) => handleToggleComplete(task.id, e.target.checked)}
+                className="mr-2 h-3 w-3 accent-orange-300 focus:ring-2 focus:ring-offset-2 focus:ring-orange-300 transition-all hover:scale-110"
+              />
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <span className="text-sm break-all">{truncateTitle(task.name, 20)}</span>
+                <span className="text-sm text-slate-500">{task.deadline}</span>
+              </div>
+            </div>
             <div className="flex justify-center gap-2 flex-col sm:flex-row">
               <button
                 onClick={() => handleEdit(task)}

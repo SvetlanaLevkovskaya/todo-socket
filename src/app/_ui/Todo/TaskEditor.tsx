@@ -8,19 +8,25 @@ export const TaskEditor = ({
   initialTask,
   onCancel,
 }: {
-  onSave: (updatedTask: { name: string; description: string; deadline: string }) => void
-  initialTask?: Task | Omit<Task, 'id'>
+  onSave: (updatedTask: Task | Omit<Task, 'id'>) => void
+  initialTask?: Task | Omit<Task, 'id'> | null
   onCancel: () => void
 }) => {
-  const [task, setTask] = useState(initialTask || { name: '', description: '', deadline: '' })
+  const [task, setTask] = useState<Omit<Task, 'id'>>({
+    name: initialTask?.name || '',
+    description: initialTask?.description || '',
+    deadline: initialTask?.deadline || '',
+    completed: initialTask?.completed || false,
+  })
 
   const handleSave = () => {
     if (!task.name || !task.description || !task.deadline) {
       customToastError('Please fill in all fields!')
       return
     }
-    onSave(task)
-    setTask({ name: '', description: '', deadline: '' })
+    const fullTask = initialTask && 'id' in initialTask ? { ...initialTask, ...task } : task
+    onSave(fullTask)
+    setTask({ name: '', description: '', deadline: '', completed: false })
   }
 
   return (
