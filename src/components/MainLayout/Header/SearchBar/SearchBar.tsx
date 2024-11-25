@@ -3,13 +3,10 @@
 import { ChangeEvent, memo, useEffect, useRef, useState } from 'react'
 
 import Image from 'next/image'
-import { usePathname, useRouter } from 'next/navigation'
 
 import { useDebounce } from '@/hooks'
 
-const SearchBarComponent = () => {
-  const router = useRouter()
-  const pathname = usePathname()
+const SearchBarComponent = ({ onSearch }: { onSearch: (query: string) => void }) => {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [query, setQuery] = useState(() =>
@@ -18,28 +15,16 @@ const SearchBarComponent = () => {
   const debouncedQuery = useDebounce(query)
 
   useEffect(() => {
-    if (debouncedQuery && pathname !== '/') {
-      router.push('/')
-    }
-  }, [debouncedQuery, router])
-
-  useEffect(() => {
-    if (pathname !== '/') {
-      setQuery('')
-    }
-  }, [pathname])
-
-  const handleChangeQuery = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setQuery(value.trim())
-  }
-
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.selectionStart = inputRef.current.selectionEnd = query.length
-    }
+    localStorage.setItem('searchQuery', query)
   }, [query])
 
+  useEffect(() => {
+    onSearch(debouncedQuery)
+  }, [debouncedQuery, onSearch])
+
+  const handleChangeQuery = (e: ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value.trim())
+  }
   return (
     <div className="relative w-full sm:max-w-[618px]">
       <input

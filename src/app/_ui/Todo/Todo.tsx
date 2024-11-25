@@ -6,13 +6,16 @@ import { FilterSection } from '@/app/_ui/FilterSection/FilterSection'
 import { Canvas } from '@/app/_ui/Todo/Canvas'
 import { TaskEditor } from '@/app/_ui/Todo/TaskEditor'
 import { TaskList } from '@/app/_ui/Todo/TaskList'
+import { useSearch } from '@/providers/searchProvider'
 import { getSocket } from '@/socket'
 import { Task } from '@/types'
 
 export const Todo = () => {
+  const { searchQuery } = useSearch()
   const [tasks, setTasks] = useState<Task[]>([])
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [isTaskEditorVisible, setTaskEditorVisible] = useState(false)
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>([])
 
   useEffect(() => {
     fetch('/api/tasks')
@@ -27,7 +30,6 @@ export const Todo = () => {
     })
 
     socket.on('change', (change) => {
-      console.log('Data changed:', change)
       if (change.action === 'added') {
         setTasks((prev) => [...prev, change.task])
       } else if (change.action === 'deleted') {
@@ -45,6 +47,12 @@ export const Todo = () => {
       socket.off('change')
     }
   }, [])
+
+  useEffect(() => {
+    setFilteredTasks(
+      tasks.filter((task) => task.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    )
+  }, [searchQuery, tasks])
 
   const addTask = (task: Omit<Task, 'id'>) => {
     fetch('/api/tasks', {
@@ -64,6 +72,12 @@ export const Todo = () => {
     fetch(`/api/tasks/${id}`, { method: 'DELETE' }).then(() => {
       const socket = getSocket()
       socket.emit('deleteTask', id)
+
+      const savedOrder: string[] = JSON.parse(localStorage.getItem('taskOrder') || '[]')
+
+      const updatedOrder = savedOrder.filter((taskId) => taskId !== id)
+
+      localStorage.setItem('taskOrder', JSON.stringify(updatedOrder))
     })
   }
 
@@ -111,7 +125,7 @@ export const Todo = () => {
       <FilterSection />
       <div className="flex-grow px-4 max-w-[650px] min-w-[330px] w-full">
         <TaskList
-          tasks={tasks}
+          tasks={filteredTasks}
           onEdit={handleEditTaskClick}
           onDelete={deleteTask}
           onAddTask={handleAddTaskClick}
@@ -126,7 +140,7 @@ export const Todo = () => {
           </div>
         )}
 
-        <Canvas tasks={tasks} />
+        <Canvas tasks={filteredTasks} />
       </div>
     </div>
   )
