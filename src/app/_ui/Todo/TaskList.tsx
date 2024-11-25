@@ -42,6 +42,7 @@ export const TaskList = ({
               className="mr-2 h-3 w-3 accent-orange-300 focus:ring-2 focus:ring-offset-2 focus:ring-orange-300 transition-all hover:scale-110"
             />
             <span className="text-sm break-all">{truncateTitle(task.name, 20)}</span>
+            <span className="text-sm break-all">{task.deadline}</span>
             <div className="flex justify-center gap-2 flex-col sm:flex-row">
               <button
                 onClick={() => handleEdit(task)}

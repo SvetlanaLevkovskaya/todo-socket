@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { FilterSection } from '@/app/_ui/FilterSection/FilterSection'
+import { SortSelect } from '@/app/_ui/SortSelect/SortSelect'
 import { Canvas } from '@/app/_ui/Todo/Canvas'
 import { TaskEditor } from '@/app/_ui/Todo/TaskEditor'
 import { TaskList } from '@/app/_ui/Todo/TaskList'
@@ -18,6 +19,11 @@ export const Todo = () => {
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([])
   const [selectedFilters, setSelectedFilters] = useState<string>(
     typeof window !== 'undefined' ? localStorage.getItem('selectedFilter') || 'all' : 'all'
+  )
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(
+    typeof window !== 'undefined'
+      ? (localStorage.getItem('sortOrder') as 'asc' | 'desc') || 'asc'
+      : 'asc'
   )
 
   useEffect(() => {
@@ -72,17 +78,26 @@ export const Todo = () => {
         filtered = filtered.filter((task) => !task.completed)
       }
 
+      filtered = filtered.sort((a, b) => {
+        const dateA = new Date(a.deadline)
+        const dateB = new Date(b.deadline)
+        return sortOrder === 'asc'
+          ? dateA.getTime() - dateB.getTime()
+          : dateB.getTime() - dateA.getTime()
+      })
+
       setFilteredTasks(filtered)
     }
 
     applyFilters()
-  }, [selectedFilters, tasks, searchQuery])
+  }, [selectedFilters, tasks, searchQuery, sortOrder])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('selectedFilter', selectedFilters)
+      localStorage.setItem('sortOrder', sortOrder)
     }
-  }, [selectedFilters])
+  }, [selectedFilters, sortOrder])
 
   const addTask = (task: Omit<Task, 'id'>) => {
     fetch('/api/tasks', {
@@ -177,9 +192,17 @@ export const Todo = () => {
     setSelectedFilters(filter)
   }
 
+  const handleSortChange = (order: 'asc' | 'desc') => {
+    setSortOrder(order)
+  }
+
   return (
-    <div className="flex flex-col md:flex-row justify-center gap-4">
-      <FilterSection selectedFilters={selectedFilters} onFilterChange={handleFilterChange} />
+    <div className="flex flex-col md:flex-row justify-center gap-6 sm:gap-24">
+      <div className="flex flex-col gap-4">
+        <FilterSection selectedFilters={selectedFilters} onFilterChange={handleFilterChange} />
+        <SortSelect sortOrder={sortOrder} onSortChange={handleSortChange} />
+      </div>
+
       <div className="flex-grow px-4 max-w-[650px] min-w-[330px] w-full">
         <TaskList
           tasks={filteredTasks}
