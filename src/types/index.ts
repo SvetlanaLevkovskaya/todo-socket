@@ -6,4 +6,4 @@ export interface Task {
   completed: boolean
 }
 
-export type SortOrder = 'asc' | 'desc'
+export type SortOrderType = 'asc' | 'desc'

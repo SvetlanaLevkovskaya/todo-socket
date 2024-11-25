@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import * as fabric from 'fabric'
 
 import { Task } from '@/types'
-import { truncateTitle } from '@/utils'
+import { formattedDate, truncateTitle } from '@/utils'
 
 export const Canvas = ({ tasks }: { tasks: Task[] }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -85,7 +85,7 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
             splitByGrapheme: true,
           })
 
-          const dateText = new fabric.Textbox(task.deadline, {
+          const dateText = new fabric.Textbox(formattedDate(task.deadline), {
             fontSize: 12,
             fill: '#9ca3af',
             width: taskWidth - padding * 2,

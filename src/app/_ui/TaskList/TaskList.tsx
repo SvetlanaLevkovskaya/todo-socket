@@ -1,7 +1,7 @@
 import { FaPlus } from 'react-icons/fa6'
 
 import { Task } from '@/types'
-import { truncateTitle } from '@/utils'
+import { formattedDate, truncateTitle } from '@/utils'
 
 export const TaskList = ({
   tasks,
@@ -44,7 +44,7 @@ export const TaskList = ({
               />
               <div className="flex flex-col gap-2 sm:flex-row">
                 <span className="text-sm break-all">{truncateTitle(task.name, 20)}</span>
-                <span className="text-sm text-slate-500">{task.deadline}</span>
+                <span className="text-sm text-slate-500">{formattedDate(task.deadline)}</span>
               </div>
             </div>
             <div className="flex justify-center gap-2 flex-col sm:flex-row">

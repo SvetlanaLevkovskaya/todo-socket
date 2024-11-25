@@ -1,4 +1,4 @@
-import { Todo } from '@/app/_ui/Todo/Todo'
+import { Todo } from '@/app/_ui'
 
 export default async function Home() {
   return <Todo />

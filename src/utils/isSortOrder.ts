@@ -1,5 +1,5 @@
-import { SortOrder } from '@/types'
+import { SortOrderType } from '@/types'
 
-export const isSortOrder = (value: string | null): value is SortOrder => {
+export const isSortOrder = (value: string | null): value is SortOrderType => {
   return value === 'asc' || value === 'desc'
 }

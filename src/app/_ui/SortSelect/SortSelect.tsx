@@ -1,17 +1,21 @@
-'use client'
+import { ChangeEvent } from 'react'
 
-import { ChangeEvent, memo } from 'react'
+import { SortOrderType } from '@/types'
+import { isSortOrder } from '@/utils'
 
-const SortSelectComponent = ({
+export const SortSelect = ({
   onSortChange,
   sortOrder,
 }: {
-  onSortChange: (order: 'asc' | 'desc') => void
-  sortOrder: 'asc' | 'desc'
+  onSortChange: (order: SortOrderType) => void
+  sortOrder: SortOrderType
 }) => {
   const handleSortChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const newSortOrder = event.target.value as 'asc' | 'desc'
-    onSortChange(newSortOrder)
+    const newSortOrder = event.target.value as SortOrderType
+
+    if (isSortOrder(newSortOrder)) {
+      onSortChange(newSortOrder)
+    }
   }
 
   return (
@@ -29,7 +33,3 @@ const SortSelectComponent = ({
     </select>
   )
 }
-
-SortSelectComponent.displayName = 'SortSelect'
-
-export const SortSelect = memo(SortSelectComponent)
