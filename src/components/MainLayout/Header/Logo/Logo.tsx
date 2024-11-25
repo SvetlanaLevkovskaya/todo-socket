@@ -1,13 +1,19 @@
 import { memo } from 'react'
 
+import Image from 'next/image'
 import Link from 'next/link'
-
-import LogoIcon from '@/components/Icons/LogoIcon'
 
 const LogoComponent = () => {
   return (
     <Link href={'/'}>
-      <LogoIcon height={55} width={116} className="hidden md:block w-auto h-auto" />
+      <Image
+        src={'/logo.gif'}
+        alt={'logo'}
+        width={34}
+        height={34}
+        className="hidden md:block w-[64px] h-[64px]"
+        priority
+      />
     </Link>
   )
 }

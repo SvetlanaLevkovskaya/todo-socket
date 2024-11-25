@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import * as fabric from 'fabric'
 
 import { Task } from '@/types'
+import { truncateTitle } from '@/utils'
 
 export const Canvas = ({ tasks }: { tasks: Task[] }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -17,7 +18,9 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
     const updateCanvasSize = () => {
       if (containerRef.current) {
         const maxWidth = 650
-        const width = Math.min(containerRef.current.offsetWidth, maxWidth)
+        const minWidth = 290
+        const containerWidth = containerRef.current.offsetWidth
+        const width = Math.max(Math.min(containerWidth, maxWidth), minWidth)
         setCanvasWidth(width)
       }
     }
@@ -57,7 +60,10 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
           return indexA === -1 ? 1 : indexB === -1 ? -1 : indexA - indexB
         })
         .forEach((task) => {
+          const padding = 10
           const taskWidth = width - 40
+
+          const truncatedName = truncateTitle(task.name, 25)
 
           const rect = new fabric.Rect({
             width: taskWidth,
@@ -69,19 +75,23 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
             strokeWidth: 1,
           })
 
-          const text = new fabric.Textbox(task.name, {
+          const text = new fabric.Textbox(truncatedName, {
             fontSize: 14,
             fill: '#1f2937',
-            width: taskWidth - 20,
+            width: taskWidth - padding * 2,
             textAlign: 'center',
             fontFamily: 'Arial',
-            top: 10,
+            top: padding,
+            left: padding,
+            splitByGrapheme: true,
           })
 
           const dateText = new fabric.Textbox(task.deadline, {
             fontSize: 12,
             fill: '#9ca3af',
-            top: taskHeight - 20,
+            width: taskWidth - padding * 2,
+            top: taskHeight - padding - 10,
+            left: padding,
             textAlign: 'center',
             fontFamily: 'Arial',
           })
@@ -122,7 +132,10 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
   }, [tasks, canvasWidth])
 
   return (
-    <div ref={containerRef} className="mx-auto border rounded-lg my-4 p-2 py-4 h-auto">
+    <div
+      ref={containerRef}
+      className="mx-auto border rounded-lg my-4 p-2 py-4 h-auto min-w-[300px]"
+    >
       <canvas ref={canvasRef} />
     </div>
   )

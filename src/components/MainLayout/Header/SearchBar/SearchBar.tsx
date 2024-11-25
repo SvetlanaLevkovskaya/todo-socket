@@ -41,10 +41,10 @@ const SearchBarComponent = () => {
   }, [query])
 
   return (
-    <div className="relative max-w-[618px]">
+    <div className="relative w-full sm:max-w-[618px]">
       <input
         ref={inputRef}
-        className="w-[300px] sm:w-[618px] border border-slate-200 focus:border-amber-500 transition-all p-4 pl-6 rounded-lg text-sm placeholder-gray-500 outline-none"
+        className="w-full sm:w-[618px] border border-slate-200 focus:border-amber-500 transition-all p-4 pl-6 rounded-lg text-sm placeholder-gray-500 outline-none"
         placeholder="Search"
         onChange={handleChangeQuery}
         value={query}

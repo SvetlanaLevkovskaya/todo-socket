@@ -109,7 +109,7 @@ export const Todo = () => {
   return (
     <div className="flex flex-col md:flex-row justify-center gap-4">
       <FilterSection />
-      <div className="flex-grow px-4 max-w-[650px] w-full">
+      <div className="flex-grow px-4 max-w-[650px] min-w-[330px] w-full">
         <TaskList
           tasks={tasks}
           onEdit={handleEditTaskClick}
@@ -120,7 +120,7 @@ export const Todo = () => {
           <div key={editingTask?.id || 'new'} className="my-4 pb-6">
             <TaskEditor
               onSave={handleSaveTask}
-              initialTask={editingTask ? { ...editingTask } : undefined} // Приведение типа
+              initialTask={editingTask ? { ...editingTask } : undefined}
               onCancel={handleCancelTaskEditor}
             />
           </div>

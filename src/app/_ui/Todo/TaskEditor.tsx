@@ -1,14 +1,17 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import { customToastError } from '@/components'
 import { Task } from '@/types'
 
-interface Props {
+export const TaskEditor = ({
+  onSave,
+  initialTask,
+  onCancel,
+}: {
   onSave: (updatedTask: Task | Omit<Task, 'id'>) => void
   initialTask?: Task | Omit<Task, 'id'>
   onCancel: () => void
-}
-export const TaskEditor = ({ onSave, initialTask, onCancel }: Props) => {
+}) => {
   const [task, setTask] = useState(initialTask || { name: '', description: '', deadline: '' })
 
   const handleSave = () => {

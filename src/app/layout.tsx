@@ -11,11 +11,11 @@ import { MainLayout, Spinner } from '@/components'
 const manrope = Manrope({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'E-comm',
-  description: 'E-commerce App',
+  title: 'ToDo',
+  description: 'ToDo App',
   twitter: {
-    title: 'E-comm',
-    description: 'E-commerce App',
+    title: 'ToDo',
+    description: 'ToDo App',
     images: 'https://og-examples.vercel.sh/api/static',
   },
 }
