@@ -13,6 +13,7 @@ const LogoComponent = () => {
         height={34}
         className="hidden md:block w-[64px] h-[64px]"
         priority
+        unoptimized
       />
     </Link>
   )

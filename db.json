@@ -37,13 +37,6 @@
     },
     {
       "name": "Clean the house",
-      "description": "Finish the project documentation by the end of the day.",
-      "deadline": "2024-12-08",
-      "completed": false,
-      "id": 7
-    },
-    {
-      "name": "Clean the house",
       "description": "Don't forget to confirm the dentist appointment.",
       "deadline": "2024-12-09",
       "completed": false,

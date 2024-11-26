@@ -17,11 +17,11 @@ export const useTasks = () => {
   const [tasks, setTasks] = useState<Task[]>([])
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [isTaskEditorVisible, setTaskEditorVisible] = useState(false)
-  const [selectedFilters, setSelectedFilters] = useState<string>(
+  const [selectedFilters, setSelectedFilters] = useState<string>(() =>
     readFromLocalStorage('selectedFilter', 'all')
   )
   const [sortOrder, setSortOrder] = useState<SortOrderType>(
-    readFromLocalStorage('sortOrder', 'asc') as SortOrderType
+    () => readFromLocalStorage('sortOrder', 'asc') as SortOrderType
   )
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([])
 

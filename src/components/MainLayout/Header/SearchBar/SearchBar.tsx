@@ -5,17 +5,17 @@ import { ChangeEvent, memo, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 
 import { useDebounce } from '@/hooks'
+import { readFromLocalStorage, saveToLocalStorage } from '@/utils'
 
 const SearchBarComponent = ({ onSearch }: { onSearch: (query: string) => void }) => {
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const [query, setQuery] = useState(() =>
-    typeof window !== 'undefined' ? localStorage.getItem('searchQuery') || '' : ''
-  )
+  const [query, setQuery] = useState<string>(() => readFromLocalStorage('searchQuery', 'all'))
+
   const debouncedQuery = useDebounce(query)
 
   useEffect(() => {
-    localStorage.setItem('searchQuery', query)
+    saveToLocalStorage('searchQuery', query)
   }, [query])
 
   useEffect(() => {
@@ -25,6 +25,13 @@ const SearchBarComponent = ({ onSearch }: { onSearch: (query: string) => void })
   const handleChangeQuery = (e: ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value.trim())
   }
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.selectionStart = inputRef.current.selectionEnd = query.length
+    }
+  }, [query])
+
   return (
     <div className="relative w-full sm:max-w-[618px]">
       <input
