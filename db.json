@@ -4,7 +4,7 @@
       "name": "Attend the meeting",
       "description": "Ensure the application is submitted before the deadline.",
       "deadline": "2024-11-29",
-      "completed": false,
+      "completed": true,
       "id": 1
     },
     {
@@ -32,7 +32,7 @@
       "name": "Complete the project!",
       "description": "Confirm the time with John and have a quick catch-up.",
       "deadline": "2024-12-05",
-      "completed": false,
+      "completed": true,
       "id": 6
     },
     {
@@ -62,6 +62,13 @@
       "deadline": "2024-12-18",
       "completed": true,
       "id": 10
+    },
+    {
+      "name": "new1",
+      "description": "mew",
+      "deadline": "2024-11-27T22:56",
+      "completed": false,
+      "id": 11
     }
   ]
 }

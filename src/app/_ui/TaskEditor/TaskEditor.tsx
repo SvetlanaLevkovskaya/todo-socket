@@ -36,20 +36,30 @@ export const TaskEditor = ({
         value={task.name}
         onChange={(e) => setTask({ ...task, name: e.target.value })}
         placeholder="Task name"
-        className="w-full p-2 border rounded-lg mb-2 text-sm focus:border-amber-500 transition-all placeholder-gray-500 outline-none"
+        className="w-full p-2 border rounded-lg mb-2 text-sm focus:border-orange-500 transition-all2 placeholder-slate-500 outline-none"
       />
       <textarea
         value={task.description}
         onChange={(e) => setTask({ ...task, description: e.target.value })}
         placeholder="Task description"
-        className="w-full p-2 border rounded-lg mb-2 text-sm focus:border-amber-500 transition-all placeholder-gray-500 outline-none"
+        className="w-full p-2 border rounded-lg mb-2 text-sm focus:border-orange-500 transition-all2 placeholder-slate-500 outline-none"
       />
+      {/*      <input
+       type="text"
+       value={task.deadline}
+       onChange={(e) => setTask({ ...task, deadline: e.target.value })}
+       placeholder="Deadline"
+       onFocus={(e) => (e.target.type = 'date')}
+       onBlur={(e) => (e.target.type = 'text')}
+       className="w-full p-2 border rounded-lg mb-2 text-sm focus:border-amber-500 transition-all placeholder-slate-500 outline-none"
+       />*/}
+
       <input
-        type="date"
+        type="datetime-local"
         value={task.deadline}
         onChange={(e) => setTask({ ...task, deadline: e.target.value })}
         placeholder="Deadline"
-        className="w-full p-2 border rounded-lg mb-2 text-sm focus:border-amber-500 transition-all placeholder-gray-500 outline-none"
+        className="w-full p-2 border rounded-lg mb-2 text-sm focus:border-amber-500 transition-all placeholder-slate-500 outline-none"
       />
       <div className="flex justify-center gap-2">
         <button onClick={handleSave} className="w-full bg-teal-400 text-white py-2 rounded-lg">

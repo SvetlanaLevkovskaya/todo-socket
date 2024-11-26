@@ -61,7 +61,7 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
         })
         .forEach((task) => {
           const padding = 10
-          const taskWidth = width - 40
+          const taskWidth = width - 20
 
           const truncatedName = truncateTitle(task.name, 25)
 
@@ -81,7 +81,6 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
             width: taskWidth - padding * 2,
             textAlign: 'center',
             top: padding,
-            left: padding,
             splitByGrapheme: true,
           })
 
@@ -89,12 +88,9 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
             fontSize: 12,
             fill: '#9ca3af',
             width: taskWidth - padding * 2,
-            top: taskHeight - padding - 10,
-            left: padding,
+            top: taskHeight - padding * 2,
             textAlign: 'center',
           })
-
-          dateText.left = (taskWidth - dateText.width!) / 2
 
           const group = new fabric.Group([rect, text, dateText], {
             left: 10,
@@ -130,10 +126,7 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
   }, [tasks, canvasWidth])
 
   return (
-    <div
-      ref={containerRef}
-      className="mx-auto border rounded-lg my-4 p-2 py-4 h-auto min-w-[300px]"
-    >
+    <div ref={containerRef} className="border border-slate-200 rounded-lg min-w-[300px]">
       <canvas ref={canvasRef} />
     </div>
   )
