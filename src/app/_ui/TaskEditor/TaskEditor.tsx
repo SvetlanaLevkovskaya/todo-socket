@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import Flatpickr from 'react-flatpickr'
+
+import 'flatpickr/dist/themes/material_green.css'
 
 import { customToastError } from '@/components'
 import { Task } from '@/types'
@@ -44,22 +47,16 @@ export const TaskEditor = ({
         placeholder="Task description"
         className="w-full p-2 border rounded-lg mb-2 text-sm focus:border-orange-500 transition-all2 placeholder-slate-500 outline-none"
       />
-      {/*      <input
-       type="text"
-       value={task.deadline}
-       onChange={(e) => setTask({ ...task, deadline: e.target.value })}
-       placeholder="Deadline"
-       onFocus={(e) => (e.target.type = 'date')}
-       onBlur={(e) => (e.target.type = 'text')}
-       className="w-full p-2 border rounded-lg mb-2 text-sm focus:border-amber-500 transition-all placeholder-slate-500 outline-none"
-       />*/}
-
-      <input
-        type="datetime-local"
+      <Flatpickr
+        data-enable-time
         value={task.deadline}
-        onChange={(e) => setTask({ ...task, deadline: e.target.value })}
         placeholder="Deadline"
-        className="w-full p-2 border rounded-lg mb-2 text-sm focus:border-amber-500 transition-all placeholder-slate-500 outline-none"
+        onChange={([date]) => setTask({ ...task, deadline: date.toISOString() })}
+        options={{
+          enableTime: true,
+          dateFormat: 'd.m.Y H:i',
+        }}
+        className="w-full p-2 border rounded-lg mb-2 text-sm focus:border-orange-500 transition-all2 placeholder-slate-500 outline-none"
       />
       <div className="flex justify-center gap-2">
         <button onClick={handleSave} className="w-full bg-teal-400 text-white py-2 rounded-lg">

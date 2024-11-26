@@ -20,3 +20,8 @@
     text-wrap: balance;
   }
 }
+
+input[type="datetime-local"] {
+  color: #9ca3af;
+}
+

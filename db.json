@@ -11,7 +11,7 @@
       "name": "Call John",
       "description": "Go through the code and check for any errors.",
       "deadline": "2024-12-15",
-      "completed": true,
+      "completed": false,
       "id": 2
     },
     {
@@ -53,7 +53,7 @@
       "name": "Review the code",
       "description": "Ensure the application is submitted before the deadline.",
       "deadline": "2024-12-10",
-      "completed": true,
+      "completed": false,
       "id": 9
     },
     {
@@ -62,13 +62,6 @@
       "deadline": "2024-12-18",
       "completed": true,
       "id": 10
-    },
-    {
-      "name": "new1",
-      "description": "mew",
-      "deadline": "2024-11-27T22:56",
-      "completed": false,
-      "id": 11
     }
   ]
 }
