@@ -1,27 +1,42 @@
 'use client'
 
+import { useState } from 'react'
+
 import { Canvas } from '@/app/_ui/Canvas/Canvas'
 import { FilterSection } from '@/app/_ui/FilterSection/FilterSection'
 import { SortSelect } from '@/app/_ui/SortSelect/SortSelect'
 import { TaskEditor } from '@/app/_ui/TaskEditor/TaskEditor'
 import { TaskList } from '@/app/_ui/TaskList/TaskList'
 import { useTasks } from '@/hooks'
+import { Task } from '@/types'
 
 export const Todo = () => {
+  const [editingTask, setEditingTask] = useState<Task | null>(null)
+  const [isTaskEditorVisible, setTaskEditorVisible] = useState(false)
+
   const {
     filteredTasks,
+    saveTask,
+    deleteTaskById,
+    toggleComplete,
     selectedFilters,
     sortOrder,
-    editingTask,
-    isTaskEditorVisible,
     setSelectedFilters,
     setSortOrder,
-    setTaskEditorVisible,
-    setEditingTask,
-    handleSaveTask,
-    handleDeleteTask,
-    handleToggleComplete,
   } = useTasks()
+
+  const handleSaveTask = async (task: Task | Omit<Task, 'id'>) => {
+    await saveTask(task)
+    setTaskEditorVisible(false)
+  }
+
+  const handleDeleteTask = async (id: string) => {
+    await deleteTaskById(id)
+  }
+
+  const handleToggleComplete = async (id: string, completed: boolean) => {
+    await toggleComplete(id, completed)
+  }
 
   return (
     <div className="flex flex-col md:flex-row justify-center gap-6 sm:gap-24">

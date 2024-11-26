@@ -18,7 +18,7 @@
       "name": "Buy groceries",
       "description": "Need to get eggs, milk, and bread for the week.",
       "deadline": "2024-12-15",
-      "completed": true,
+      "completed": false,
       "id": 3
     },
     {
@@ -39,7 +39,7 @@
       "name": "Clean the house",
       "description": "Don't forget to confirm the dentist appointment.",
       "deadline": "2024-12-09",
-      "completed": false,
+      "completed": true,
       "id": 8
     },
     {

@@ -10,7 +10,7 @@ import { readFromLocalStorage, saveToLocalStorage } from '@/utils'
 const SearchBarComponent = ({ onSearch }: { onSearch: (query: string) => void }) => {
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const [query, setQuery] = useState<string>(() => readFromLocalStorage('searchQuery', 'all'))
+  const [query, setQuery] = useState<string>(() => readFromLocalStorage('searchQuery', ''))
 
   const debouncedQuery = useDebounce(query)
 
