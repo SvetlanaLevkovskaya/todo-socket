@@ -4,10 +4,11 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:3002/:path*', // порт json-server
+        destination: 'http://localhost:3002/:path*',
       },
     ]
   },
+  reactStrictMode: false,
 }
 
 export default nextConfig
