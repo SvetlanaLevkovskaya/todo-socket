@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react'
 import { useTaskApi } from '@/hooks/useTaskApi'
 import { useTaskFilters } from '@/hooks/useTaskFilters'
 
+import { getSocket } from '@/services/socket'
+
 import { useSearch } from '@/providers/searchProvider'
-import { getSocket } from '@/socket'
 import { Task } from '@/types'
 
 export const useTasks = () => {

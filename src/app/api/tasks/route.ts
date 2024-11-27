@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const JSON_SERVER_URL = 'http://localhost:3002/tasks'
+import { JSON_SERVER_URL } from '@/config/urls'
 
 export async function GET() {
   try {

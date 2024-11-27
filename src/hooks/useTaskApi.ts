@@ -6,9 +6,10 @@ import {
   fetchTasks,
   toggleTaskCompletion,
   updateTask,
-} from '@/app/api/apiService'
+} from '@/services/apiService'
+import { getSocket } from '@/services/socket'
+
 import { customToastError, customToastSuccess } from '@/components'
-import { getSocket } from '@/socket'
 import { Task } from '@/types'
 
 export const useTaskApi = () => {
@@ -33,7 +34,7 @@ export const useTaskApi = () => {
       } else {
         const newTask = await createTask(task)
         socket.emit('addTask', newTask)
-        customToastSuccess('Task created successfully')
+        customToastSuccess(`Task ${task.name} created successfully`)
         return newTask
       }
     } catch (error) {
@@ -48,7 +49,7 @@ export const useTaskApi = () => {
       await deleteTask(id)
       const socket = getSocket()
       socket.emit('deleteTask', id)
-      customToastSuccess('Task deleted successfully')
+      customToastSuccess(`Task ${id} deleted successfully`)
     } catch (error) {
       customToastError('Failed to delete task')
       console.error(error)
@@ -61,7 +62,7 @@ export const useTaskApi = () => {
       const updatedTask = await toggleTaskCompletion(id, completed)
       const socket = getSocket()
       socket.emit('toggleComplete', { id, completed })
-      customToastSuccess('Task status updated successfully')
+      customToastSuccess(`Task ${id} status updated successfully`)
       return updatedTask
     } catch (error) {
       customToastError('Failed to toggle task completion')
