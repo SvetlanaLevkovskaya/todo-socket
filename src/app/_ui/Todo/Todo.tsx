@@ -25,17 +25,9 @@ export const Todo = () => {
     setSortOrder,
   } = useTasks()
 
-  const handleSaveTask = async (task: Task | Omit<Task, 'id'>) => {
+  const handleSave = async (task: Task | Omit<Task, 'id'>) => {
     await saveTask(task)
-    setTaskEditorVisible(false)
-  }
-
-  const handleDeleteTask = async (id: string) => {
-    await deleteTaskById(id)
-  }
-
-  const handleToggleComplete = async (id: string, completed: boolean) => {
-    await toggleComplete(id, completed)
+    setTaskEditorVisible(!isTaskEditorVisible)
   }
 
   return (
@@ -50,21 +42,21 @@ export const Todo = () => {
           tasks={filteredTasks}
           onEdit={(task) => {
             setEditingTask(task)
-            setTaskEditorVisible(true)
+            setTaskEditorVisible(!isTaskEditorVisible)
           }}
-          onDelete={handleDeleteTask}
+          onDelete={deleteTaskById}
           onAddTask={() => {
             setEditingTask(null)
-            setTaskEditorVisible(true)
+            setTaskEditorVisible(!isTaskEditorVisible)
           }}
-          onToggleComplete={handleToggleComplete}
+          onToggleComplete={toggleComplete}
         />
         {isTaskEditorVisible && (
           <div className="my-4 pb-6">
             <TaskEditor
               initialTask={editingTask}
-              onSave={handleSaveTask}
-              onCancel={() => setTaskEditorVisible(false)}
+              onSave={handleSave}
+              onCancel={() => setTaskEditorVisible(!isTaskEditorVisible)}
             />
           </div>
         )}
