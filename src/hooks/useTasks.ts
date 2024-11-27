@@ -48,6 +48,7 @@ export const useTasks = () => {
 
     return () => {
       socket.off('change', handleSocketChange)
+      socket.disconnect()
     }
   }, [])
 
