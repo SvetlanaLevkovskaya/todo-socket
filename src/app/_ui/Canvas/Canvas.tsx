@@ -1,17 +1,18 @@
-import { useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 
 import * as fabric from 'fabric'
 
 import { Task } from '@/types'
-import { formattedDate, truncateTitle } from '@/utils'
+import { formattedDate, readFromLocalStorage, saveToLocalStorage, truncateTitle } from '@/utils'
 
-export const Canvas = ({ tasks }: { tasks: Task[] }) => {
+export const CanvasComponent = ({ tasks }: { tasks: Task[] }) => {
+  console.log('Canvas')
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [canvasWidth, setCanvasWidth] = useState(650)
 
   const saveOrder = (order: string[]) => {
-    localStorage.setItem('taskOrder', JSON.stringify(order))
+    saveToLocalStorage('taskOrder', JSON.stringify(order))
   }
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
 
     let currentY = 10
 
-    const savedOrder: string[] = JSON.parse(localStorage.getItem('taskOrder') || '[]')
+    const savedOrder: string[] = JSON.parse(readFromLocalStorage('taskOrder', '[]'))
 
     const createGroups = () => {
       tasks
@@ -73,6 +74,12 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
             ry: 8,
             stroke: '#e2e8f0',
             strokeWidth: 1,
+            shadow: new fabric.Shadow({
+              color: 'rgba(0, 0, 0, 0.15)',
+              blur: 10,
+              offsetX: 2,
+              offsetY: 4,
+            }),
           })
 
           const text = new fabric.Textbox(truncatedName, {
@@ -131,3 +138,7 @@ export const Canvas = ({ tasks }: { tasks: Task[] }) => {
     </div>
   )
 }
+
+CanvasComponent.displayName = 'Canvas'
+
+export const Canvas = memo(CanvasComponent)

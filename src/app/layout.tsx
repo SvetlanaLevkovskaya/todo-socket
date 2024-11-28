@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={manrope.className}>
         <Suspense fallback={<Spinner />}>
-          <ToastContainer limit={1} />
+          <ToastContainer limit={5} />
           <MainLayout>{children}</MainLayout>
         </Suspense>
       </body>

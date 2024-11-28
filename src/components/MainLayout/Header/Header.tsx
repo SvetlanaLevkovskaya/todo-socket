@@ -5,6 +5,7 @@ import { SearchBar } from './SearchBar/SearchBar'
 import { useSearch } from '@/providers/searchProvider'
 
 export const Header = () => {
+  console.log('Header')
   const { setSearchQuery } = useSearch()
 
   const handleSearch = (query: string) => {

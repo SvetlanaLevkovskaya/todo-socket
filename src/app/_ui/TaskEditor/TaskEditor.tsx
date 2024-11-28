@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import Flatpickr from 'react-flatpickr'
 
 import 'flatpickr/dist/themes/material_green.css'
@@ -6,7 +6,7 @@ import 'flatpickr/dist/themes/material_green.css'
 import { customToastError } from '@/components'
 import { Task } from '@/types'
 
-export const TaskEditor = ({
+export const TaskEditorComponent = ({
   onSave,
   initialTask,
   onCancel,
@@ -15,6 +15,7 @@ export const TaskEditor = ({
   initialTask?: Task | Omit<Task, 'id'> | null
   onCancel: () => void
 }) => {
+  console.log('TaskEditor')
   const [task, setTask] = useState<Omit<Task, 'id'>>({
     name: initialTask?.name || '',
     description: initialTask?.description || '',
@@ -59,13 +60,23 @@ export const TaskEditor = ({
         className="w-full p-2 border rounded-lg mb-2 text-sm focus:border-orange-500 transition-all2 placeholder-slate-500 outline-none"
       />
       <div className="flex justify-center gap-2">
-        <button onClick={handleSave} className="w-full bg-teal-400 text-white py-2 rounded-lg">
+        <button
+          onClick={handleSave}
+          className="w-full bg-teal-400 text-white py-2 rounded-lg shadow-lg hover:shadow-xl active:shadow-md transition-all"
+        >
           Save
         </button>
-        <button onClick={onCancel} className="w-full bg-cyan-400 text-white py-2 rounded-lg">
+        <button
+          onClick={onCancel}
+          className="w-full bg-cyan-400 text-white py-2 rounded-lg shadow-lg hover:shadow-xl active:shadow-md transition-all"
+        >
           Cancel
         </button>
       </div>
     </>
   )
 }
+
+TaskEditorComponent.displayName = 'TaskEditor'
+
+export const TaskEditor = memo(TaskEditorComponent)

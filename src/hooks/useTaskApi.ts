@@ -23,7 +23,8 @@ export const useTaskApi = () => {
     }
   }, [])
 
-  const saveTask = useCallback(async (task: Task | Omit<Task, 'id'>) => {
+  const saveTask = async (task: Task | Omit<Task, 'id'>) => {
+    console.log('saveTask')
     const socket = getSocket()
     try {
       if ('id' in task) {
@@ -42,9 +43,10 @@ export const useTaskApi = () => {
       console.error(error)
       throw error
     }
-  }, [])
+  }
 
-  const deleteTaskById = useCallback(async (id: string) => {
+  const deleteTaskById = async (id: string) => {
+    console.log('deleteTaskById')
     try {
       await deleteTask(id)
       const socket = getSocket()
@@ -55,9 +57,10 @@ export const useTaskApi = () => {
       console.error(error)
       throw error
     }
-  }, [])
+  }
 
-  const toggleComplete = useCallback(async (id: string, completed: boolean) => {
+  const toggleComplete = async (id: string, completed: boolean) => {
+    console.log('toggleComplete')
     try {
       const updatedTask = await toggleTaskCompletion(id, completed)
       const socket = getSocket()
@@ -69,6 +72,7 @@ export const useTaskApi = () => {
       console.error(error)
       throw error
     }
-  }, [])
+  }
+
   return { fetchAllTasks, saveTask, deleteTaskById, toggleComplete }
 }

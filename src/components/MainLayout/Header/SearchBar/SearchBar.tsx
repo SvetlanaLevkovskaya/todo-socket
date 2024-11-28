@@ -8,6 +8,7 @@ import { useDebounce } from '@/hooks'
 import { readFromLocalStorage, saveToLocalStorage } from '@/utils'
 
 const SearchBarComponent = ({ onSearch }: { onSearch: (query: string) => void }) => {
+  console.log('SearchBarComponent')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [query, setQuery] = useState<string>(() => readFromLocalStorage('searchQuery', ''))
@@ -35,8 +36,7 @@ const SearchBarComponent = ({ onSearch }: { onSearch: (query: string) => void })
   return (
     <div className="relative w-full sm:max-w-[618px]">
       <input
-        ref={inputRef}
-        className="w-full sm:w-[618px] border border-slate-200 focus:border-amber-500 transition-all p-4 pl-6 rounded-lg text-sm placeholder-gray-500 outline-none"
+        className="w-full sm:w-[618px] border border-slate-200 focus:border-amber-500 transition-all2 p-4 pl-6 rounded-lg text-sm placeholder-gray-500 outline-none"
         placeholder="Search"
         onChange={handleChangeQuery}
         value={query}

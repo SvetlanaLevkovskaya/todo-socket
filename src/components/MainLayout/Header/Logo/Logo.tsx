@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 const LogoComponent = () => {
+  console.log('LogoComponent')
   return (
     <Link href={'/'}>
       <Image

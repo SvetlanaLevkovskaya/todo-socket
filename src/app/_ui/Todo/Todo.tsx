@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { FaPlus } from 'react-icons/fa6'
 
 import { Canvas } from '@/app/_ui/Canvas/Canvas'
 import { FilterSection } from '@/app/_ui/FilterSection/FilterSection'
@@ -45,10 +46,6 @@ export const Todo = () => {
             setTaskEditorVisible(!isTaskEditorVisible)
           }}
           onDelete={deleteTaskById}
-          onAddTask={() => {
-            setEditingTask(null)
-            setTaskEditorVisible(!isTaskEditorVisible)
-          }}
           onToggleComplete={toggleComplete}
         />
         {isTaskEditorVisible && (
@@ -60,6 +57,19 @@ export const Todo = () => {
             />
           </div>
         )}
+
+        <div className="flex flex-col gap-6 my-6">
+          <button
+            onClick={() => {
+              setEditingTask(null)
+              setTaskEditorVisible(!isTaskEditorVisible)
+            }}
+            className="flex justify-center items-center p-3 border border-orange-400 rounded-lg w-full my-2 bg-orange-300 text-white shadow-lg hover:shadow-xl active:shadow-md transition-all"
+          >
+            <FaPlus className="mr-2" color="white" />
+            Add task
+          </button>
+        </div>
         <Canvas tasks={filteredTasks} />
       </div>
     </div>

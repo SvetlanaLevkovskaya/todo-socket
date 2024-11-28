@@ -43,7 +43,7 @@ const config: Config = {
           justifyContent: 'space-between',
         },
         '.all2': {
-          transition: 'all .2s ease-in-out',
+          transition: 'all 0.2s ease-in-out',
         },
       })
     }),
