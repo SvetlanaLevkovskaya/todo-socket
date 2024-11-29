@@ -4,14 +4,14 @@ import { JSON_SERVER_URL } from '@/config/urls'
 
 export async function GET() {
   try {
-    const response = await fetch(JSON_SERVER_URL, {
-      next: { revalidate: 60 },
-    })
+    const response = await fetch(JSON_SERVER_URL)
     if (!response.ok) {
       console.error('Failed to fetch tasks:', response.statusText)
       return NextResponse.json({ error: 'Failed to fetch tasks' }, { status: 500 })
     }
     const tasks = await response.json()
+
+    console.log('tasks - NextRequest', tasks)
     return NextResponse.json(tasks)
   } catch (error) {
     console.error('Error during fetch:', error)
