@@ -10,7 +10,6 @@ export const SortSelect = ({
   onSortChange: (order: SortOrderType) => void
   sortOrder: SortOrderType
 }) => {
-  console.log('SortSelect')
   const handleSortChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const newSortOrder = event.target.value as SortOrderType
 

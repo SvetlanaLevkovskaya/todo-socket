@@ -1,9 +1,7 @@
-import { memo } from 'react'
-
 import { Task } from '@/types'
 import { formattedDate, truncateTitle } from '@/utils'
 
-export const TaskListComponent = ({
+export const TaskList = ({
   tasks,
   onEdit,
   onDelete,
@@ -14,7 +12,6 @@ export const TaskListComponent = ({
   onDelete: (id: string) => void
   onToggleComplete: (id: string, completed: boolean) => void
 }) => {
-  console.log('TaskList')
   const handleEdit = (task: Task): void => {
     onEdit(task)
   }
@@ -67,7 +64,3 @@ export const TaskListComponent = ({
     </div>
   )
 }
-
-TaskListComponent.displayName = 'TaskList'
-
-export const TaskList = memo(TaskListComponent)

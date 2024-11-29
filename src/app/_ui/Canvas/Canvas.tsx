@@ -6,7 +6,6 @@ import { Task } from '@/types'
 import { formattedDate, readFromLocalStorage, saveToLocalStorage, truncateTitle } from '@/utils'
 
 export const CanvasComponent = ({ tasks }: { tasks: Task[] }) => {
-  console.log('Canvas')
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [canvasWidth, setCanvasWidth] = useState(650)

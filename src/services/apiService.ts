@@ -1,15 +1,20 @@
-import { API_BASE_URL } from '@/config/urls'
+import { JSON_SERVER_URL } from '@/config/urls'
 
 import { Task } from '@/types'
 
 export const fetchTasks = async (): Promise<Task[]> => {
-  const response = await fetch(API_BASE_URL)
-  if (!response.ok) throw new Error('Failed to fetch tasks')
-  return response.json()
+  try {
+    const response = await fetch(`${JSON_SERVER_URL}?timestamp=${Date.now()}`)
+    if (!response.ok) throw new Error('Failed to fetch tasks')
+    return await response.json()
+  } catch (error) {
+    console.error('Fetch tasks error:', error)
+    return []
+  }
 }
 
 export const createTask = async (task: Omit<Task, 'id'>): Promise<Task> => {
-  const response = await fetch(API_BASE_URL, {
+  const response = await fetch(JSON_SERVER_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(task),
@@ -19,7 +24,7 @@ export const createTask = async (task: Omit<Task, 'id'>): Promise<Task> => {
 }
 
 export const updateTask = async (task: Task): Promise<Task> => {
-  const response = await fetch(`${API_BASE_URL}/${task.id}`, {
+  const response = await fetch(`${JSON_SERVER_URL}/${task.id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(task),
@@ -29,12 +34,12 @@ export const updateTask = async (task: Task): Promise<Task> => {
 }
 
 export const deleteTask = async (id: string): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/${id}`, { method: 'DELETE' })
+  const response = await fetch(`${JSON_SERVER_URL}/${id}`, { method: 'DELETE' })
   if (!response.ok) throw new Error('Failed to delete task')
 }
 
 export const toggleTaskCompletion = async (id: string, completed: boolean): Promise<Task> => {
-  const response = await fetch(`${API_BASE_URL}/${id}`, {
+  const response = await fetch(`${JSON_SERVER_URL}/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ completed }),

@@ -8,7 +8,7 @@
     "json-server": "json-server --watch src/db.json --port 3002 --no-cors",
     "socket-server": "node src/server.js",
     "build": "next build",
-    "start": "next start",
+    "start": "concurrently \"next start\" \"npm run json-server\" \"npm run socket-server\"",
     "lint": "next lint"
   },
   "dependencies": {

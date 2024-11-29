@@ -15,7 +15,6 @@ export const TaskEditorComponent = ({
   initialTask?: Task | Omit<Task, 'id'> | null
   onCancel: () => void
 }) => {
-  console.log('TaskEditor')
   const [task, setTask] = useState<Omit<Task, 'id'>>({
     name: initialTask?.name || '',
     description: initialTask?.description || '',

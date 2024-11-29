@@ -10,7 +10,7 @@ const initSocket = (server) => {
   })
 
   io.on('connection', (socket) => {
-    console.log('New client connected')
+    console.log(`Client connected: ${socket.id}`)
 
     socket.on('addTask', (newTask) => {
       tasks.push(newTask)
@@ -36,8 +36,12 @@ const initSocket = (server) => {
       console.log(`Task ${id} marked as ${completed ? 'completed' : 'not completed'}`)
     })
 
-    socket.on('disconnect', () => {
-      console.log('Client disconnected')
+    socket.on('error', (err) => {
+      console.error('Socket error:', err)
+    })
+
+    socket.on('disconnect', (reason) => {
+      console.log(`Client disconnected: ${reason}`)
     })
   })
 }

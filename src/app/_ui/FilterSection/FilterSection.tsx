@@ -9,7 +9,6 @@ export const FilterSection = ({
   selectedFilters: string
   onFilterChange: (filter: string) => void
 }) => {
-  console.log('FilterSection')
   const handleFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
     onFilterChange(value)
