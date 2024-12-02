@@ -13,7 +13,7 @@
 - Tailwind CSS
 - ESLint
 - Prettier
-- 
+
 ### Backend:
 - Node.js
 - Socket.IO
