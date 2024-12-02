@@ -11,5 +11,7 @@ export const getSocket = (): Socket => {
       reconnection: true,
     })
   }
+
+  console.log('Socket connected:', socket!.connected)
   return socket
 }

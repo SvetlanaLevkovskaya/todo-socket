@@ -1,15 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { FaPlus } from 'react-icons/fa6'
 
-import {
-  createTask,
-  deleteTask,
-  fetchTasks,
-  toggleTaskCompletion,
-  updateTask,
-} from '@/services/apiService'
+import { createTask, deleteTask, toggleTaskCompletion, updateTask } from '@/services/apiService'
 import { getSocket } from '@/services/socket'
 
 import { Canvas } from '@/app/_ui/Canvas/Canvas'
@@ -18,109 +12,16 @@ import { SortSelect } from '@/app/_ui/SortSelect/SortSelect'
 import { TaskEditor } from '@/app/_ui/TaskEditor/TaskEditor'
 import { TaskList } from '@/app/_ui/TaskList/TaskList'
 import { Spinner, customToastError, customToastSuccess } from '@/components'
-import { useSearch } from '@/providers/searchProvider'
+import { useFilteredTasks, useTasks } from '@/hooks'
 import { Task } from '@/types'
-import { readFromLocalStorage, saveToLocalStorage } from '@/utils'
 
 export const Todo = ({ initialTasks }: { initialTasks: Task[] }) => {
-  const { searchQuery } = useSearch()
-  const [tasks, setTasks] = useState<Task[]>(initialTasks)
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [editingTask, setEditingTask] = useState<Task | null>(null)
+  const { tasks, isLoading, setTasks } = useTasks(initialTasks)
+  const { filteredTasks, selectedFilters, setSelectedFilters, sortOrder, setSortOrder } =
+    useFilteredTasks(tasks)
+
   const [isTaskEditorVisible, setTaskEditorVisible] = useState(false)
-  const [selectedFilters, setSelectedFilters] = useState<string>(
-    readFromLocalStorage('selectedFilter', 'all')
-  )
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(
-    readFromLocalStorage('sortOrder', 'asc') as 'asc' | 'desc'
-  )
-  const [filteredTasks, setFilteredTasks] = useState<Task[]>([])
-
-  useEffect(() => {
-    if (tasks.length > 0) {
-      setIsLoading(false)
-    } else {
-      fetchTasks()
-        .then((fetchedTasks) => {
-          setTasks(fetchedTasks)
-
-          setIsLoading(false)
-        })
-        .catch(() => {
-          setIsLoading(false)
-        })
-    }
-  }, [tasks.length])
-
-  useEffect(() => {
-    if (!isLoading) {
-      setTasks(tasks)
-    }
-  }, [tasks, isLoading])
-
-  useEffect(() => {
-    const socket = getSocket()
-
-    const handleSocketChange = (change: {
-      action: string
-      task?: Task
-      taskId?: string
-      id?: string
-      completed?: boolean
-    }) => {
-      setTasks((prev) => {
-        switch (change.action) {
-          case 'added':
-            return [...prev, change.task!]
-          case 'deleted':
-            return prev.filter((task) => task.id !== change.taskId)
-          case 'edited':
-            return prev.map((task) => (task.id === change.task!.id ? change.task! : task))
-          case 'toggledComplete':
-            return prev.map((task) =>
-              task.id === change.id ? { ...task, completed: change.completed! } : task
-            )
-          default:
-            return prev
-        }
-      })
-    }
-
-    socket.on('change', handleSocketChange)
-
-    return () => {
-      socket.off('change', handleSocketChange)
-    }
-  }, [])
-
-  useEffect(() => {
-    const applyFilters = () => {
-      let result = tasks.filter((task) =>
-        task.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-
-      if (selectedFilters === 'done') {
-        result = result.filter((task) => task.completed)
-      } else if (selectedFilters === 'in progress') {
-        result = result.filter((task) => !task.completed)
-      }
-
-      result = result.sort((a, b) => {
-        const dateA = new Date(a.deadline).getTime()
-        const dateB = new Date(b.deadline).getTime()
-        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA
-      })
-
-      setFilteredTasks(result)
-    }
-
-    applyFilters()
-  }, [tasks, selectedFilters, searchQuery, sortOrder])
-
-  useEffect(() => {
-    saveToLocalStorage('selectedFilter', selectedFilters)
-    saveToLocalStorage('sortOrder', sortOrder)
-  }, [selectedFilters, sortOrder])
+  const [editingTask, setEditingTask] = useState<Task | null>(null)
 
   const handleSaveTask = useCallback(async (task: Task | Omit<Task, 'id'>) => {
     try {
@@ -147,6 +48,7 @@ export const Todo = ({ initialTasks }: { initialTasks: Task[] }) => {
       await deleteTask(id)
       const socket = getSocket()
       socket.emit('deleteTask', id)
+      console.log('Deleting task with ID:', id)
       customToastSuccess(`Task ${id} deleted successfully`)
     } catch (error) {
       customToastError('Failed to delete task')

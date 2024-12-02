@@ -20,7 +20,7 @@ const initSocket = (server) => {
 
     socket.on('deleteTask', (taskId) => {
       tasks = tasks.filter((task) => task.id !== taskId)
-      io.emit('change', { action: 'deleted', taskId })
+      io.emit('change', { action: 'deleted', task: { id: taskId } })
       console.log('Task deleted:', taskId)
     })
 
@@ -32,7 +32,7 @@ const initSocket = (server) => {
 
     socket.on('toggleComplete', ({ id, completed }) => {
       tasks = tasks.map((task) => (task.id === id ? { ...task, completed } : task))
-      io.emit('change', { action: 'toggledComplete', id, completed })
+      io.emit('change', { action: 'toggledComplete', task: { id, completed } })
       console.log(`Task ${id} marked as ${completed ? 'completed' : 'not completed'}`)
     })
 

@@ -28,18 +28,19 @@ const SearchBarComponent = ({ onSearch }: { onSearch: (query: string) => void })
 
   useEffect(() => {
     if (inputRef.current) {
-      inputRef.current.selectionStart = inputRef.current.selectionEnd = query.length
+      inputRef.current.focus()
+      inputRef.current.setSelectionRange(query.length, query.length)
     }
-  }, [query])
+  }, [query.length])
 
   return (
     <div className="relative w-full sm:max-w-[618px]">
       <input
-        className="w-full sm:w-[618px] border border-slate-200 focus:border-amber-500 transition-all2 p-4 pl-6 rounded-lg text-sm placeholder-gray-500 outline-none"
+        ref={inputRef}
+        className="w-full sm:w-[618px] border border-slate-200 focus:border-amber-500 p-4 pl-6 rounded-lg text-sm placeholder-gray-500 outline-none"
         placeholder="Search"
         onChange={handleChangeQuery}
         value={query}
-        autoFocus
       />
       <Image
         height={0}
