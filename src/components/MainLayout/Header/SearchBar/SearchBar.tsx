@@ -2,7 +2,7 @@
 
 import { ChangeEvent, memo, useEffect, useRef, useState } from 'react'
 
-import Image from 'next/image'
+import { SearchIcon } from '@/components/Icons/SearchIcon'
 
 import { useDebounce } from '@/hooks'
 import { readFromLocalStorage, saveToLocalStorage } from '@/utils'
@@ -34,24 +34,15 @@ const SearchBarComponent = ({ onSearch }: { onSearch: (query: string) => void })
   }, [query.length])
 
   return (
-    <div className="relative w-full sm:max-w-[618px]">
+    <div className="relative flex w-full md:max-w-[75%] min-w-80">
       <input
         ref={inputRef}
-        className="w-full sm:w-[618px] border border-slate-200 focus:border-amber-500 p-4 pl-6 rounded-lg text-sm placeholder-gray-500 outline-none"
+        className="w-full border border-slate-200 focus:border-amber-500 py-4 pl-6 pr-10 rounded-lg text-sm placeholder-slate-400 outline-none"
         placeholder="Search"
         onChange={handleChangeQuery}
         value={query}
       />
-      <Image
-        height={0}
-        width={0}
-        style={{ height: '16px', width: '16px' }}
-        alt="search"
-        src="/loop.svg"
-        priority
-        unoptimized
-        className="absolute right-4 top-1/2 transform -translate-y-1/2"
-      />
+      <SearchIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 pointer-events-none w-3.5 h-3.5 sm:w-4 sm:h-4" />
     </div>
   )
 }

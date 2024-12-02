@@ -76,7 +76,7 @@ export const Todo = ({ initialTasks }: { initialTasks: Task[] }) => {
   if (isLoading) return <Spinner />
 
   return (
-    <div className="flex flex-col md:flex-row justify-center gap-6 sm:gap-24">
+    <div className="flex flex-col md:flex-row justify-center gap-24">
       <div className="flex flex-col gap-4">
         <FilterSection selectedFilters={selectedFilters} onFilterChange={setSelectedFilters} />
         <SortSelect sortOrder={sortOrder} onSortChange={setSortOrder} />
